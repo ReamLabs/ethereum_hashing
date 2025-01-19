@@ -26,6 +26,14 @@ pub fn hash32_concat(h1: &[u8], h2: &[u8]) -> [u8; 32] {
     hasher.finalize().into()
 }
 
+pub trait Sha256Context {
+    fn new() -> Self;
+
+    fn update(&mut self, bytes: &[u8]);
+
+    fn finalize(self) -> [u8; HASH_LEN];
+}
+
 /// Context for incremental hashing
 pub struct Context(Sha256);
 
