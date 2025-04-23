@@ -1,8 +1,6 @@
+use crate::HASH_LEN;
 use sha2::{Digest, Sha256};
 use std::sync::LazyLock;
-
-/// Length of a SHA256 hash in bytes.
-pub const HASH_LEN: usize = 32;
 
 /// Returns the digest of `input`.
 pub fn hash(input: &[u8]) -> Vec<u8> {

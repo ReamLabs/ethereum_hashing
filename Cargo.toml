@@ -24,5 +24,7 @@ rustc-hex = "2"
 wasm-bindgen-test = "0.3.33"
 
 [features]
-default = ["zero_hash_cache"]
+default = ["zero_hash_cache", "sha2"]
 zero_hash_cache = []
+sha2 = []
+poseidon2 = []
