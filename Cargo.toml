@@ -14,7 +14,7 @@ rust-version = "1.80.0"
 [dependencies]
 sha2 = "0.10"
 # poseidon2 hash
-zkhash = { git = "https://github.com/HorizenLabs/poseidon2.git", rev = "055bde3" }
+zkhash = { git = "https://github.com/HorizenLabs/poseidon2.git", rev = "055bde3" , optional = true}
 
 [dev-dependencies]
 rustc-hex = "2"
@@ -26,4 +26,4 @@ wasm-bindgen-test = "0.3.33"
 default = ["zero_hash_cache", "sha2"]
 zero_hash_cache = []
 sha2 = []
-poseidon2 = []
+poseidon2 = ["zkhash"]

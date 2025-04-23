@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+#[cfg(feature = "poseidon2")]
 mod poseidon2;
 mod sha2;
 
