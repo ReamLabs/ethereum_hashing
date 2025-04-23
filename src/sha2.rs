@@ -1,6 +1,5 @@
 use crate::HASH_LEN;
 use sha2::{Digest, Sha256};
-use std::sync::LazyLock;
 
 /// Returns the digest of `input`.
 pub fn hash(input: &[u8]) -> Vec<u8> {
@@ -49,22 +48,6 @@ impl Context {
     }
 }
 
-/// The max index that can be used with `ZERO_HASHES`.
-#[cfg(feature = "zero_hash_cache")]
-pub const ZERO_HASHES_MAX_INDEX: usize = 48;
-
-#[cfg(feature = "zero_hash_cache")]
-/// Cached zero hashes where `ZERO_HASHES[i]` is the hash of a Merkle tree with 2^i zero leaves.
-pub static ZERO_HASHES: LazyLock<Vec<[u8; HASH_LEN]>> = LazyLock::new(|| {
-    let mut hashes = vec![[0; HASH_LEN]; ZERO_HASHES_MAX_INDEX + 1];
-
-    for i in 0..ZERO_HASHES_MAX_INDEX {
-        hashes[i + 1] = hash32_concat(&hashes[i], &hashes[i]);
-    }
-
-    hashes
-});
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -82,15 +65,5 @@ mod tests {
         let expected_hex = "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9";
         let expected: Vec<u8> = expected_hex.from_hex().unwrap();
         assert_eq!(expected, output);
-    }
-
-    #[cfg(feature = "zero_hash_cache")]
-    mod zero_hash {
-        use super::*;
-
-        #[test]
-        fn zero_hash_zero() {
-            assert_eq!(ZERO_HASHES[0], [0; 32]);
-        }
     }
 }
