@@ -81,6 +81,22 @@ impl Poseidon2Hash {
     }
 }
 
+pub struct Context(Vec<u8>);
+
+impl Context {
+    fn new() -> Self {
+        Self(vec![])
+    }
+
+    fn update(&mut self, bytes: &[u8]) {
+        self.0.extend_from_slice(bytes);
+    }
+
+    fn finalize(self) -> [u8; HASH_LEN] {
+        Poseidon2Hash::hash_to_fixed_bytes(&self.0)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

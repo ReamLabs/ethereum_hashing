@@ -2,12 +2,13 @@
 mod poseidon2;
 mod sha2;
 
+/// Export
+
 #[cfg(feature = "sha2")]
-pub use sha2::{hash, hash32_concat, hash_fixed};
-use std::sync::LazyLock;
+pub use crate::sha2::{hash, hash32_concat, hash_fixed, Context};
 
 #[cfg(feature = "poseidon2")]
-pub use poseidon2::{hash, hash32_concat, hash_fixed};
+pub use crate::poseidon2::{hash, hash32_concat, hash_fixed, Context};
 
 /// Length of a SHA256 hash in bytes.
 pub const HASH_LEN: usize = 32;
@@ -16,6 +17,7 @@ pub const HASH_LEN: usize = 32;
 #[cfg(feature = "zero_hash_cache")]
 pub const ZERO_HASHES_MAX_INDEX: usize = 48;
 
+use std::sync::LazyLock;
 #[cfg(feature = "zero_hash_cache")]
 /// Cached zero hashes where `ZERO_HASHES[i]` is the hash of a Merkle tree with 2^i zero leaves.
 pub static ZERO_HASHES: LazyLock<Vec<[u8; HASH_LEN]>> = LazyLock::new(|| {
@@ -28,7 +30,18 @@ pub static ZERO_HASHES: LazyLock<Vec<[u8; HASH_LEN]>> = LazyLock::new(|| {
     hashes
 });
 
+/// This is used to tree_hash-0.9.1/src/merkle_hasher.rs
+/// For now, it's not implement.
+pub trait Sha256Context {
+    fn new() -> Self;
+
+    fn update(&mut self, bytes: &[u8]);
+
+    fn finalize(self) -> [u8; HASH_LEN];
+}
+
 #[cfg(feature = "zero_hash_cache")]
+#[cfg(test)]
 mod test_zero_hash {
     use super::*;
 
