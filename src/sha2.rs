@@ -27,15 +27,15 @@ pub fn hash32_concat(h1: &[u8], h2: &[u8]) -> [u8; 32] {
 pub struct Context(Sha256);
 
 impl Context {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self(Sha256::new())
     }
 
-    fn update(&mut self, bytes: &[u8]) {
+    pub fn update(&mut self, bytes: &[u8]) {
         self.0.update(bytes);
     }
 
-    fn finalize(self) -> [u8; HASH_LEN] {
+    pub fn finalize(self) -> [u8; HASH_LEN] {
         self.0.finalize().into()
     }
 }
