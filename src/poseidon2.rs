@@ -1,9 +1,9 @@
 use crate::HASH_LEN;
-use zkhash::ark_ff::{BigInteger, PrimeField, ToConstraintField};
-use zkhash::fields::bn256::FpBN256;
-use zkhash::poseidon2::poseidon2::Poseidon2;
-use zkhash::poseidon2::poseidon2_instance_bn256::POSEIDON2_BN256_PARAMS;
-
+use zkhash::{
+    ark_ff::{BigInteger, PrimeField, ToConstraintField},
+    fields::bn256::FpBN256,
+    poseidon2::{poseidon2::Poseidon2, poseidon2_instance_bn256::POSEIDON2_BN256_PARAMS},
+};
 /// Returns the digest of `input`.
 pub fn hash(input: &[u8]) -> Vec<u8> {
     Poseidon2Hash::hash_to_bytes(input)

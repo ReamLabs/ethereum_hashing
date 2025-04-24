@@ -10,7 +10,7 @@ pub use crate::poseidon2::{hash, hash32_concat, hash_fixed, Context};
 #[cfg(feature = "sha2")]
 pub use crate::sha2::{hash, hash32_concat, hash_fixed, Context};
 
-/// Length of a SHA256 hash in bytes.
+/// Length of a hash in bytes.
 pub const HASH_LEN: usize = 32;
 
 /// The max index that can be used with `ZERO_HASHES`.
@@ -30,8 +30,9 @@ pub static ZERO_HASHES: LazyLock<Vec<[u8; HASH_LEN]>> = LazyLock::new(|| {
     hashes
 });
 
-/// This is used to tree_hash-0.9.1/src/merkle_hasher.rs
-/// For now, it's not implement.
+/// This trait is intended to support integration with `tree_hash`
+/// (e.g., in `tree_hash-0.9.1/src/merkle_hasher.rs`),
+/// but is currently not implemented.
 pub trait Sha256Context {
     fn new() -> Self;
 
