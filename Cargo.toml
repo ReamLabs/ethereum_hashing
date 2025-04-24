@@ -23,7 +23,7 @@ rustc-hex = "2"
 wasm-bindgen-test = "0.3.33"
 
 [features]
-default = ["zero_hash_cache", "sha2"]
+default = ["zero_hash_cache", "poseidon2"]
 zero_hash_cache = []
 # Hash features are mutually exclusive, You must and only can select one of them.
 sha2 = ["sha2/default"]
