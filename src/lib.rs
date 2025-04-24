@@ -4,10 +4,10 @@ mod poseidon2;
 mod sha2;
 
 /// Export poseidon2 hash
-#[cfg(feature = "poseidon2")]
+#[cfg(all(feature = "poseidon2", not(feature = "sha2")))]
 pub use crate::poseidon2::{hash, hash32_concat, hash_fixed, Context};
 /// Export sha2 hash
-#[cfg(feature = "sha2")]
+#[cfg(all(feature = "sha2", not(feature = "poseidon2")))]
 pub use crate::sha2::{hash, hash32_concat, hash_fixed, Context};
 
 /// Length of a hash in bytes.
