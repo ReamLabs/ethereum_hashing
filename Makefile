@@ -20,7 +20,7 @@ help: # Display this help.
 ##@ Build
 .PHONY: build
 build: # Build the Ream binary into `target` directory.
-	cargo build --bin ream --features "$(FEATURES)" --profile "$(PROFILE)"
+	cargo build --release
 
 .PHONY: test
 test: # Run all tests.

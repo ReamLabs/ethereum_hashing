@@ -18,7 +18,10 @@ pub const HASH_LEN: usize = 32;
 pub const ZERO_HASHES_MAX_INDEX: usize = 48;
 
 use std::sync::LazyLock;
-#[cfg(feature = "zero_hash_cache")]
+#[cfg(all(
+    feature = "zero_hash_cache",
+    any(feature = "sha2", feature = "poseidon2")
+))]
 /// Cached zero hashes where `ZERO_HASHES[i]` is the hash of a Merkle tree with 2^i zero leaves.
 pub static ZERO_HASHES: LazyLock<Vec<[u8; HASH_LEN]>> = LazyLock::new(|| {
     let mut hashes = vec![[0; HASH_LEN]; ZERO_HASHES_MAX_INDEX + 1];
