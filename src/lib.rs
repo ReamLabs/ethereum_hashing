@@ -3,13 +3,12 @@
 mod poseidon2;
 mod sha2;
 
-/// Export
-
-#[cfg(feature = "sha2")]
-pub use crate::sha2::{hash, hash32_concat, hash_fixed, Context};
-
+/// Export poseidon2 hash
 #[cfg(feature = "poseidon2")]
 pub use crate::poseidon2::{hash, hash32_concat, hash_fixed, Context};
+/// Export sha2 hash
+#[cfg(feature = "sha2")]
+pub use crate::sha2::{hash, hash32_concat, hash_fixed, Context};
 
 /// Length of a SHA256 hash in bytes.
 pub const HASH_LEN: usize = 32;

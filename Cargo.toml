@@ -14,7 +14,7 @@ rust-version = "1.80.0"
 [dependencies]
 sha2 = "0.10"
 # poseidon2 hash
-zkhash = { git = "https://github.com/HorizenLabs/poseidon2.git", rev = "055bde3" , optional = true}
+zkhash = { git = "https://github.com/HorizenLabs/poseidon2.git", rev = "055bde3", optional = true }
 
 [dev-dependencies]
 rustc-hex = "2"

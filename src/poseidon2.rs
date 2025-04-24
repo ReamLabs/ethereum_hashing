@@ -10,14 +10,13 @@ pub fn hash(input: &[u8]) -> Vec<u8> {
 }
 
 /// Hash function returning a fixed-size array (to save on allocations).
-
 pub fn hash_fixed(input: &[u8]) -> [u8; HASH_LEN] {
     Poseidon2Hash::hash_to_fixed_bytes(input)
 }
 
 /// Compute the hash of two slices concatenated.
 pub fn hash32_concat(h1: &[u8], h2: &[u8]) -> [u8; 32] {
-    let input = vec![h1, h2].concat();
+    let input = [h1, h2].concat();
     Poseidon2Hash::hash_to_fixed_bytes(&input)
 }
 
@@ -69,18 +68,18 @@ impl Poseidon2Hash {
 
         let hash_fields = Self::hash(&fields);
 
-        let res = hash_fields.into_iter().sum::<FpBN256>();
-        res
+        hash_fields.into_iter().sum::<FpBN256>()
     }
 
     pub fn hash_field_to_bytes(fields: &[FpBN256]) -> Vec<u8> {
-        let hash_fields = Self::hash(&fields);
+        let hash_fields = Self::hash(fields);
 
         let res = hash_fields.iter().sum::<FpBN256>();
         res.into_bigint().to_bytes_be()
     }
 }
 
+#[derive(Clone, Default)]
 pub struct Context(Vec<u8>);
 
 impl Context {

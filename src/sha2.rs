@@ -24,6 +24,7 @@ pub fn hash32_concat(h1: &[u8], h2: &[u8]) -> [u8; 32] {
 }
 
 /// Context for incremental hashing
+#[derive(Clone, Default)]
 pub struct Context(Sha256);
 
 impl Context {
