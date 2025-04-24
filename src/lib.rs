@@ -45,7 +45,10 @@ pub trait Sha256Context {
     fn finalize(self) -> [u8; HASH_LEN];
 }
 
-#[cfg(feature = "zero_hash_cache")]
+#[cfg(all(
+    feature = "zero_hash_cache",
+    any(feature = "sha2", feature = "poseidon2")
+))]
 #[cfg(test)]
 mod test_zero_hash {
     use super::*;
