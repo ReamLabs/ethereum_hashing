@@ -1,6 +1,7 @@
 #![allow(dead_code)]
-#[cfg(feature = "poseidon2")]
+#[cfg(all(feature = "poseidon2", not(feature = "sha2")))]
 mod poseidon2;
+#[cfg(all(feature = "sha2", not(feature = "poseidon2")))]
 mod sha2;
 
 /// Export poseidon2 hash
