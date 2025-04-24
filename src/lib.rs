@@ -24,7 +24,7 @@ pub static ZERO_HASHES: LazyLock<Vec<[u8; HASH_LEN]>> = LazyLock::new(|| {
     let mut hashes = vec![[0; HASH_LEN]; ZERO_HASHES_MAX_INDEX + 1];
 
     for i in 0..ZERO_HASHES_MAX_INDEX {
-        hashes[i + 1] = crate::hash32_concat(&hashes[i], &hashes[i]);
+        hashes[i + 1] = hash32_concat(&hashes[i], &hashes[i]);
     }
 
     hashes

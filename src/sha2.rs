@@ -1,5 +1,6 @@
-use crate::HASH_LEN;
 use sha2::{Digest, Sha256};
+
+use crate::HASH_LEN;
 
 /// Returns the digest of `input`.
 pub fn hash(input: &[u8]) -> Vec<u8> {
@@ -42,6 +43,7 @@ impl Context {
 }
 
 #[cfg(test)]
+#[cfg(feature = "sha2")]
 mod tests {
     use super::*;
     use rustc_hex::FromHex;
