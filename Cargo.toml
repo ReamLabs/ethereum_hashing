@@ -12,7 +12,9 @@ categories = ["cryptography::cryptocurrencies"]
 rust-version = "1.80.0"
 
 [dependencies]
-sha2 = "0.10"
+sha2 = { version = "0.10", optional = true }
+# poseidon2 hash
+zkhash = { git = "https://github.com/HorizenLabs/poseidon2.git", rev = "055bde3", optional = true }
 
 [dev-dependencies]
 rustc-hex = "2"
@@ -21,5 +23,8 @@ rustc-hex = "2"
 wasm-bindgen-test = "0.3.33"
 
 [features]
-default = ["zero_hash_cache"]
+default = ["zero_hash_cache", "poseidon2"]
 zero_hash_cache = []
+# Hash features are mutually exclusive, You must and only can select one of them.
+sha2 = ["sha2/default"]
+poseidon2 = ["zkhash"]
