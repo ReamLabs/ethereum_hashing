@@ -176,3 +176,19 @@ impl Sha256Context for DynamicContext {
         }
     }
 }
+
+/// The max index that can be used with `ZERO_HASHES`.
+#[cfg(feature = "zero_hash_cache")]
+pub const ZERO_HASHES_MAX_INDEX: usize = 48;
+
+#[cfg(feature = "zero_hash_cache")]
+/// Cached zero hashes where `ZERO_HASHES[i]` is the hash of a Merkle tree with 2^i zero leaves.
+pub static ZERO_HASHES: LazyLock<Vec<[u8; HASH_LEN]>> = LazyLock::new(|| {
+    let mut hashes = vec![[0; HASH_LEN]; ZERO_HASHES_MAX_INDEX + 1];
+
+    for i in 0..ZERO_HASHES_MAX_INDEX {
+        hashes[i + 1] = hash32_concat(&hashes[i], &hashes[i]);
+    }
+
+    hashes
+});
