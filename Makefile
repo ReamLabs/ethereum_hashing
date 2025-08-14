@@ -25,7 +25,7 @@ build: # Build the Ream binary into `target` directory.
 .PHONY: test
 test: # Run all tests.
 	cargo test --workspace -- --nocapture
-	cargo test --no-default-features --features=poseidon2,zero_hash_cache
+	cargo test --no-default-features --features=zero_hash_cache
 
 ##@ Others
 .PHONY: clean
@@ -39,7 +39,7 @@ lint: # Run `clippy` and `rustfmt`.
 
 	# clippy for bls with supranational feature
 	cargo clippy --all-targets --no-deps -- --deny warnings
-	cargo clippy --all-targets --no-default-features --features=poseidon2,zero_hash_cache --no-deps -- --deny warnings
+	cargo clippy --all-targets --no-default-features --features=zero_hash_cache --no-deps -- --deny warnings
 
 	# cargo sort
 	cargo sort --grouped
