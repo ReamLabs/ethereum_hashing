@@ -1,31 +1,49 @@
-use sha2::{Digest, Sha256};
+//! Optimized SHA256 for use in Ethereum.
+//!
+//! The initial purpose of this crate was to provide an abstraction over the hash function used in
+//! the beacon chain. The hash function changed during the specification process, so defining it
+//! once in this crate made it easy to replace.
+//!
+//! Now this crate serves primarily as a wrapper over two SHA256 crates: `sha2` and `ring` – which
+//! it switches between at runtime based on the availability of SHA intrinsics.
+
+mod ring_impl;
+mod sha2_impl;
+
+pub use self::DynamicContext as Context;
+
+#[cfg(not(target_os = "zkvm"))]
+use ring_impl::RingImpl;
+
+use sha2_impl::Sha2CrateImpl;
+
+#[cfg(feature = "zero_hash_cache")]
 use std::sync::LazyLock;
 
 /// Length of a SHA256 hash in bytes.
 pub const HASH_LEN: usize = 32;
 
-/// Returns the digest of `input`.
+/// Returns the digest of `input` using the best available implementation.
 pub fn hash(input: &[u8]) -> Vec<u8> {
-    let mut hasher = Sha256::new();
-    hasher.update(input);
-    hasher.finalize().to_vec()
+    DynamicImpl::best().hash(input)
 }
 
 /// Hash function returning a fixed-size array (to save on allocations).
+///
+/// Uses the best available implementation based on CPU features.
 pub fn hash_fixed(input: &[u8]) -> [u8; HASH_LEN] {
-    let mut hasher = Sha256::new();
-    hasher.update(input);
-    hasher.finalize().into()
+    DynamicImpl::best().hash_fixed(input)
 }
 
 /// Compute the hash of two slices concatenated.
 pub fn hash32_concat(h1: &[u8], h2: &[u8]) -> [u8; 32] {
-    let mut hasher = Sha256::new();
-    hasher.update(h1);
-    hasher.update(h2);
-    hasher.finalize().into()
+    let mut ctxt = DynamicContext::new();
+    ctxt.update(h1);
+    ctxt.update(h2);
+    ctxt.finalize()
 }
 
+/// Context trait for abstracting over implementation contexts.
 pub trait Sha256Context {
     fn new() -> Self;
 
@@ -34,20 +52,88 @@ pub trait Sha256Context {
     fn finalize(self) -> [u8; HASH_LEN];
 }
 
-/// Context for incremental hashing
-pub struct Context(Sha256);
+/// Top-level trait implemented by both `sha2` and `ring` implementations.
+pub trait Sha256 {
+    type Context: Sha256Context;
 
-impl Context {
-    pub fn new() -> Self {
-        Self(Sha256::new())
+    fn hash(&self, input: &[u8]) -> Vec<u8>;
+
+    fn hash_fixed(&self, input: &[u8]) -> [u8; HASH_LEN];
+}
+
+/// Default dynamic implementation that switches between available implementations.
+pub enum DynamicImpl {
+    Sha2,
+    #[cfg(not(target_os = "zkvm"))]
+    Ring,
+}
+
+impl DynamicImpl {
+    /// Choose the best available implementation based on the currently executing CPU.
+    #[inline(always)]
+    pub fn best() -> Self {
+        #[cfg(target_os = "zkvm")]
+        return Self::Sha2;
+
+        #[cfg(not(target_os = "zkvm"))]
+        Self::Ring
+    }
+}
+
+impl Sha256 for DynamicImpl {
+    type Context = DynamicContext;
+
+    #[inline(always)]
+    fn hash(&self, input: &[u8]) -> Vec<u8> {
+        match self {
+            Self::Sha2 => Sha2CrateImpl.hash(input),
+            #[cfg(not(target_os = "zkvm"))]
+            Self::Ring => RingImpl.hash(input),
+        }
     }
 
-    pub fn update(&mut self, bytes: &[u8]) {
-        self.0.update(bytes);
+    #[inline(always)]
+    fn hash_fixed(&self, input: &[u8]) -> [u8; HASH_LEN] {
+        match self {
+            Self::Sha2 => Sha2CrateImpl.hash_fixed(input),
+            #[cfg(not(target_os = "zkvm"))]
+            Self::Ring => RingImpl.hash_fixed(input),
+        }
+    }
+}
+
+/// Context encapsulating all implemenation contexts.
+///
+/// This enum ends up being 8 bytes larger than the largest inner context.
+pub enum DynamicContext {
+    Sha2(sha2::Sha256),
+    #[cfg(not(target_os = "zkvm"))]
+    Ring(ring::digest::Context),
+}
+
+impl Sha256Context for DynamicContext {
+    fn new() -> Self {
+        match DynamicImpl::best() {
+            DynamicImpl::Sha2 => Self::Sha2(Sha256Context::new()),
+            #[cfg(not(target_os = "zkvm"))]
+            DynamicImpl::Ring => Self::Ring(Sha256Context::new()),
+        }
     }
 
-    pub fn finalize(self) -> [u8; HASH_LEN] {
-        self.0.finalize().into()
+    fn update(&mut self, bytes: &[u8]) {
+        match self {
+            Self::Sha2(ctxt) => Sha256Context::update(ctxt, bytes),
+            #[cfg(not(target_os = "zkvm"))]
+            Self::Ring(ctxt) => Sha256Context::update(ctxt, bytes),
+        }
+    }
+
+    fn finalize(self) -> [u8; HASH_LEN] {
+        match self {
+            Self::Sha2(ctxt) => Sha256Context::finalize(ctxt),
+            #[cfg(not(target_os = "zkvm"))]
+            Self::Ring(ctxt) => Sha256Context::finalize(ctxt),
+        }
     }
 }
 
